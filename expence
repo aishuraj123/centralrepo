@@ -1,0 +1,31 @@
+import gradio as gr
+# Global list to store expenses
+expenses = []
+def expense_tracker(action, description=None, amount=None):
+    global expenses
+    if action == "Add" and description and amount:
+        expenses.append((description, float(amount)))
+        return f"Expense '{description}' of ${amount} added!", expenses
+    elif action == "View":
+        return "Current Expenses:", expenses
+    elif action == "Total":
+        total = sum(amount for _, amount in expenses)
+        return f"Total expenses: ${total:.2f}", expenses
+    else:
+        return "Invalid action or missing inputs!", expenses
+
+interface = gr.Interface(
+    fn=expense_tracker,
+    inputs=[
+        gr.Radio(["Add", "View", "Total"], label="Action"),
+        gr.Textbox(label="Description (for Add only)"),
+        gr.Number(label="Amount (for Add only)"),
+    ],
+    outputs=[
+        gr.Text(label="Status"),
+        gr.Textbox(label="Expense List", lines=6),
+    ],
+    title="Expense Tracker",
+    description="Add, view, and calculate your daily expenses."
+)
+interface.launch(share=True)
