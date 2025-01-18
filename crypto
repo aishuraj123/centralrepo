@@ -1,0 +1,45 @@
+!pip install matplotlib requests
+
+import requests
+import time
+import matplotlib.pyplot as plt
+from IPython.display import clear_output, display
+class CryptoTracker:
+    def __init__(self, currencies):
+        self.currencies = currencies
+        self.prices = {currency: [] for currency in currencies}
+        self.api_url = "https://api.coingecko.com/api/v3/simple/price"
+    def fetch_prices(self):
+        try:
+            response = requests.get(
+                self.api_url,
+                params={"ids": ",".join(self.currencies), "vs_currencies": "usd"}
+            )
+            data = response.json()
+            for currency in self.currencies:
+                self.prices[currency].append(data[currency]["usd"])
+        except Exception as e:
+            print(f"Error fetching data: {e}")
+    def get_prices(self):
+        return self.prices
+
+def plot_prices(prices, currencies):
+    plt.figure(figsize=(10, 6))
+    for currency in currencies:
+        if len(prices[currency]) > 1:
+            plt.plot(prices[currency], label=currency.capitalize())
+    plt.legend()
+    plt.title("Live Cryptocurrency ")
+    plt.xlabel("Time Steps")
+    plt.ylabel("Price")
+    plt.grid(True)
+    plt.show()
+
+if __name__ == "__main__":
+    currencies = ["bitcoin", "ethereum", "dogecoin"]
+    tracker = CryptoTracker(currencies)
+    for _ in range(20):  # Fetch data for 20 time steps
+        tracker.fetch_prices()
+        clear_output(wait=True)  # Clear previous output
+        plot_prices(tracker.get_prices(), currencies)
+        time.sleep(5)  # Wait for 5 seconds before fetching the next!
