@@ -1,0 +1,85 @@
+import json
+import os
+
+class TaskManager:
+    def __init__(self, file_path='/content/tasks.json'):
+        self.file_path = file_path
+        self.tasks = self.load_tasks()
+
+    def load_tasks(self):
+        """Load tasks from the JSON file."""
+        if not os.path.exists(self.file_path):
+            return []
+        with open(self.file_path, "r") as file:
+            return json.load(file)
+
+    def save_tasks(self):
+        """Save tasks to the JSON file."""
+        with open(self.file_path, "w") as file:
+            json.dump(self.tasks, file, indent=4)
+
+    def add_task(self):
+        """Add a new task."""
+        task_name = input("Enter the task: ")
+        self.tasks.append({"task": task_name, "completed": False})
+        print(f"Task '{task_name}' added successfully!")
+
+    def list_tasks(self):
+        """List all tasks with their statuses."""
+        if not self.tasks:
+            print("No tasks available.")
+            return
+        for idx, task in enumerate(self.tasks, start=1):
+            status = "✔" if task["completed"] else "✘"
+            print(f"{idx}. {task['task']} [{status}]")
+
+    def mark_task_completed(self):
+        """Mark a task as completed."""
+        self.list_tasks()
+        try:
+            task_num = int(input("Enter the task number to mark as completed: "))
+            self.tasks[task_num - 1]["completed"] = True
+            print(f"Task '{self.tasks[task_num - 1]['task']}' marked as completed!")
+        except (IndexError, ValueError):
+            print("Invalid task number.")
+
+    def delete_task(self):
+        """Delete a task."""
+        self.list_tasks()
+        try:
+            task_num = int(input("Enter the task number to delete: "))
+            task_name = self.tasks.pop(task_num - 1)["task"]
+            print(f"Task '{task_name}' deleted!")
+        except (IndexError, ValueError):
+            print("Invalid task number.")
+
+    def run(self):
+        """Run the Task Manager interface."""
+        while True:
+            print("\nTask Manager")
+            print("1. Add Task")
+            print("2. List Tasks")
+            print("3. Mark Task as Completed")
+            print("4. Delete Task")
+            print("5. Exit")
+
+            choice = input("Choose an option: ")
+            if choice == "1":
+                self.add_task()
+            elif choice == "2":
+                self.list_tasks()
+            elif choice == "3":
+                self.mark_task_completed()
+            elif choice == "4":
+                self.delete_task()
+            elif choice == "5":
+                self.save_tasks()
+                print("Goodbye!")
+                break
+            else:
+                print("Invalid choice. Try again.")
+
+# Main program
+if __name__ == "__main__":
+    task_manager = TaskManager()
+    task_manager.run()
