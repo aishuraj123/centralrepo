@@ -1,0 +1,27 @@
+import gradio as gr
+def unit_converter(value, from_unit, to_unit):
+    conversions = {
+        ("meters", "kilometers"): lambda x: x / 1000,
+        ("kilometers", "meters"): lambda x: x * 1000,
+        ("celsius", "fahrenheit"): lambda x: (x * 9/5) + 32,
+        ("fahrenheit", "celsius"): lambda x: (x - 32) * 5/9,
+
+        
+    }
+    try:
+        result = conversions[(from_unit, to_unit)](value)
+        return f"{value} {from_unit} is {result:.2f} {to_unit}"
+    except KeyError:
+        return "Conversion not supported!"
+interface = gr.Interface(
+    fn=unit_converter,
+    inputs=[
+        gr.Number(label="Value"),
+        gr.Dropdown(choices=["meters", "kilometers", "celsius", "fahrenheit"], label="From Unit"),
+        gr.Dropdown(choices=["meters", "kilometers", "celsius", "fahrenheit"], label="To Unit"),
+    ],
+    outputs="text",
+    title="Unit Converter",
+    description="Convert between different units like meters to kilometers or Celsius to Fahrenheit."
+)
+interface.launch(share=True)
