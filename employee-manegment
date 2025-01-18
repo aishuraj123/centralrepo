@@ -1,0 +1,139 @@
+import json
+
+# Load employee data from file
+def load_employees(filename="employees.json"):
+    """Load employee data from a JSON file."""
+    try:
+        with open(filename, "r") as file:
+            employees = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        employees = []  # Return an empty list if the file doesn't exist or is empty
+    return employees
+
+# Save employee data to a file
+def save_employees(employees, filename="employees.json"):
+    """Save employee data to a JSON file."""
+    with open(filename, "w") as file:
+        json.dump(employees, file, indent=4)
+
+# Display all employees
+def display_employees(employees):
+    """Display all employees."""
+    if not employees:
+        print("No employees found.")
+    else:
+        print("\nEmployee List:")
+        for idx, employee in enumerate(employees, start=1):
+            print(f"{idx}. Name: {employee['name']}, Age: {employee['age']}, Department: {employee['department']}, Salary: {employee['salary']}")
+        print()
+
+# Add a new employee
+def add_employee(employees):
+    """Add a new employee to the list."""
+    name = input("Enter employee name: ")
+    age = input("Enter employee age: ")
+    department = input("Enter employee department: ")
+    salary = input("Enter employee salary: ")
+ 
+
+    # Validate inputs
+    try:
+        age = int(age)
+        salary = float(salary)
+    except ValueError:
+        print("Invalid age or salary. Please enter valid numbers.")
+        return
+
+    employees.append({"name": name, "age": age, "department": department, "salary": salary})
+    print(f"Employee '{name}' added successfully!\n")
+
+
+
+# Update an existing employee's details
+def update_employee(employees):
+    """Update an employee's details."""
+    display_employees(employees)
+    try:
+        emp_num = int(input("Enter the employee number to update: "))
+        if emp_num < 1 or emp_num > len(employees):
+            print("Invalid employee number.")
+            return
+
+        employee = employees[emp_num - 1]
+        print(f"Current details: {employee}")
+
+        name = input(f"Enter new name (leave blank to keep '{employee['name']}'): ")
+        if name:
+            employee['name'] = name
+
+        age = input(f"Enter new age (leave blank to keep '{employee['age']}'): ")
+        if age:
+            try:
+                employee['age'] = int(age)
+            except ValueError:
+                print("Invalid age input. Keeping previous value.")
+
+        department = input(f"Enter new department (leave blank to keep '{employee['department']}'): ")
+        if department:
+            employee['department'] = department
+
+        salary = input(f"Enter new salary (leave blank to keep '{employee['salary']}'): ")
+        if salary:
+            try:
+                employee['salary'] = float(salary)
+            except ValueError:
+                print("Invalid salary input. Keeping previous value.")
+
+        print(f"Employee details updated: {employee}\n")
+
+    except ValueError:
+        print("Invalid input! Please enter a valid employee number.\n")
+
+# Delete an employee
+def delete_employee(employees):
+    """Delete an employee from the list."""
+    display_employees(employees)
+    try:
+        emp_num = int(input("Enter the employee number to delete: "))
+        if emp_num < 1 or emp_num > len(employees):
+            print("Invalid employee number.")
+            return
+
+        deleted_employee = employees.pop(emp_num - 1)
+        print(f"Employee '{deleted_employee['name']}' deleted successfully!\n")
+
+    except ValueError:
+        print("Invalid input! Please enter a valid employee number.\n")
+
+# Main program loop
+def main():
+    """Main loop for the Employee Management System."""
+    employees = load_employees()  # Load employee data from file at the start
+
+    while True:
+        print("Employee Management System")
+        print("1. View Employees")
+        print("2. Add Employee")
+        print("3. Update Employee")
+        print("4. Delete Employee")
+        print("5. Exit")
+
+        choice = input("Enter your choice (1/2/3/4/5): ")
+
+        if choice == '1':
+            display_employees(employees)
+        elif choice == '2':
+            add_employee(employees)
+        elif choice == '3':
+            update_employee(employees)
+        elif choice == '4':
+            delete_employee(employees)
+        elif choice == '5':
+            save_employees(employees)  # Save employee data before exiting
+            print("Exiting the Employee Management System. Goodbye!")
+            break
+        else:
+            print("Invalid choice! Please choose a valid option.\n")
+
+if __name__ == "__main__":
+    main()
