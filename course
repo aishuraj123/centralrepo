@@ -1,0 +1,65 @@
+import gradio as gr
+# In-memory data storage for students
+students = {}
+# Courses available for registration
+available_courses = ["Math", "Science", "History", "Art", "Programming"]
+def add_student(name, email):
+    """Add a new student."""
+    if email in students:
+        return f"Student with email {email} already exists!"
+    students[email] = {"name": name, "courses": [], "attendance": "Absent"}
+    return f"Student {name} added successfully!"
+def view_students():
+    """View all registered students."""
+    if not students:
+        return "No students registered yet!"
+    result = []
+    for email, details in students.items():
+        result.append(f"Name: {details['name']}, Email: {email}, Courses: {', '.join(details['courses']) or 'None'}, Attendance: {details['attendance']}")
+    return "\n".join(result)
+def register_courses(email, selected_courses):
+    """Register courses for a student."""
+    if email not in students:
+        return f"No student found with email {email}!"
+    students[email]["courses"] = selected_courses
+    return f"Courses updated for {students[email]['name']}!"
+def mark_attendance(email, attendance):
+    """Mark attendance for a student."""
+    if email not in students:
+        return f"No student found with email {email}!"
+    students[email]["attendance"] = attendance
+    return f"Attendance updated for {students[email]['name']}!"
+# Gradio interface
+def main():
+    """Main Gradio interface."""
+    with gr.Blocks() as app:
+        gr.Markdown("## Student Management System")
+        # Add Student
+        with gr.Row():
+            name_input = gr.Textbox(label="Student Name")
+            email_input = gr.Textbox(label="Student Email")
+            add_button = gr.Button("Add Student")
+            add_output = gr.Textbox(label="Add Status", interactive=False)
+        add_button.click(add_student, inputs=[name_input, email_input], outputs=add_output)
+        # View Students
+        view_button = gr.Button("View All Students")
+        view_output = gr.Textbox(label="Registered Students", interactive=False, lines=8)
+        view_button.click(view_students, outputs=view_output)
+  # Register Courses
+        with gr.Row():
+            email_courses_input = gr.Textbox(label="Student Email for Course Registration")
+            courses_input = gr.CheckboxGroup(choices=available_courses, label="Select Courses")
+            register_button = gr.Button("Register Courses")
+            register_output = gr.Textbox(label="Course Registration Status", interactive=False)
+        register_button.click(register_courses, inputs=[email_courses_input, courses_input], outputs=register_output)
+  # Mark Attendance
+        with gr.Row():
+            email_attendance_input = gr.Textbox(label="Student Email for Attendance")
+            attendance_input = gr.Radio(["Present", "Absent"], label="Attendance Status")
+            attendance_button = gr.Button("Mark Attendance")
+            attendance_output = gr.Textbox(label="Attendance Status", interactive=False)
+        attendance_button.click(mark_attendance, inputs=[email_attendance_input, attendance_input], outputs=attendance_output)
+        return app
+# Launch the app
+app = main()
+app.launch(share=True)
