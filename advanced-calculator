@@ -1,0 +1,26 @@
+pip install gradio streamlit -q
+def advanced_calculator(expression: str) -> str:
+    try:
+        # Evaluate the expression
+        result = eval(expression)
+        return f"The result of '{expression}' is {result}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+import gradio as gr
+def advanced_calculator(expression):
+    try:
+        result = eval(expression)
+        return f"The result of '{expression}' is {result}"
+    except Exception as e:
+        return f
+"Error: {str(e)}"
+# Create the Gradio interface
+interface = gr.Interface(
+    fn=advanced_calculator,
+    inputs=gr.Textbox(label="Enter Expression (e.g., 2+2, 5*3)"),
+    outputs="text",
+    title=" Calculator",
+    description="Enter a mathematical expression to evaluate."
+)
+# Launch the interface
+interface.launch(share=True)
